@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout git repository
+      # https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Set up dotnet CLI
+      # https://github.com/actions/setup-dotnet
+      - name: Setup .NET CLI
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.x
+
+      # Install docfx
+      - name: docfx Setup
+        run: dotnet tool update -g docfx
+
+      # Build documentation
+      - name: Documentation Build
+        run: docfx docs/docfx.json
+
+      # Put materials to gh-pages branch
+      # https://github.com/peaceiris/actions-gh-pages
+      - name: Put to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: 'docs/_site'
+          user_name: github-actions
+          user_email: github-actions@github.com
